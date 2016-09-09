@@ -1,3 +1,4 @@
+# Cloned from Johannes Brenner script (github: JBrenn)
 
 # library(ggplot2)
 # library(soilwater)
@@ -18,7 +19,7 @@ Geotop_VisSoilWaterRet_gg <- function(alpha = 0.94, n = 1.5, theta_sat = 0.50, t
   # soil water pressure head in centimeter / hPa
   psi <- seq(1,10000000,accurate)
   
-  # volumetric soil water content in vol%
+  # volumetric soil water content in vol% (swc FUN from "soilwater" pkg.)
   swc <- list()
   for (i in 1:length(alpha))
     swc[[i]] <- swc(psi = -psi, alpha = alpha[i], n = n[i], theta_sat = theta_sat[i], theta_res = theta_res[i]) *100
@@ -67,63 +68,63 @@ Geotop_VisSoilWaterRet_gg <- function(alpha = 0.94, n = 1.5, theta_sat = 0.50, t
   {
     pFdata <- as.data.frame(cbind(swc=swc[[i]], psi=psi))
     p <- p + 
-      geom_line(data = pFdata, mapping = aes(x = log10(psi), y = swc), alpha = .5, col=colors[i], size=2)
+      geom_line(data = pFdata, mapping = aes(x = log10(psi), y = swc), alpha = 1, col=colors[i], size=2)
   }
   
   p + scale_color_manual(values = colors)
   
-  # Marginal density plot of x (top panel)
-  if (!all(is.na(observed$SWP))) 
-  {
-    xdensity <- ggplot(observed, aes(x = log10(SWP), fill = depth)) + 
-      geom_density(alpha=.5) + 
-      scale_fill_manual(values = colors) + 
-      theme(legend.position = "none") +
-      theme(axis.title.x = element_blank(),
-            axis.text.x = element_blank())
-  }
-  
-  # Marginal density plot of y (right panel)
-  if (!all(is.na(observed$SWC))) 
-  {
-    ydensity <- ggplot(observed, aes(x = SWC, fill = depth)) + 
-      geom_density(alpha=.5) + 
-      scale_fill_manual(values = colors) + 
-      theme(legend.position = "none") + 
-      xlim(0,60) + 
-      coord_flip() + 
-      theme(axis.title.y = element_blank(),
-            axis.text.y = element_blank())
-  }
-  
-  if (exists("ydensity") & exists("xdensity")) {
-    
-    blankPlot <- ggplot() + geom_blank(aes(1,1)) +
-      theme(
-        plot.background = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.border = element_blank(),
-        panel.background = element_blank(),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.x = element_blank(), 
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
-        axis.line = element_blank()
-      )
-    
-    p <- grid.arrange(xdensity, blankPlot, p, ydensity, 
-                 ncol=2, nrow=2, widths=c(4, 1.4), heights=c(1.4, 4))
-  } else {
-    if (exists("xdensity"))
-    p <- grid.arrange(xdensity, p, 
-                      ncol=1, nrow=2, widths=c(10), heights=c(2.5,7.5))
-    
-    if (exists("ydensity"))
-    p <- grid.arrange(p, ydensity, 
-                       ncol=2, nrow=1, widths=c(7.5, 2.5), heights=c(10)) 
-  }
+  # # Marginal density plot of x (top panel)
+  # if (!all(is.na(observed$SWP))) 
+  # {
+  #   xdensity <- ggplot(observed, aes(x = log10(SWP), fill = depth)) + 
+  #     geom_density(alpha=.5) + 
+  #     scale_fill_manual(values = colors) + 
+  #     theme(legend.position = "none") +
+  #     theme(axis.title.x = element_blank(),
+  #           axis.text.x = element_blank())
+  # }
+  # 
+  # # Marginal density plot of y (right panel)
+  # if (!all(is.na(observed$SWC))) 
+  # {
+  #   ydensity <- ggplot(observed, aes(x = SWC, fill = depth)) + 
+  #     geom_density(alpha=.5) + 
+  #     scale_fill_manual(values = colors) + 
+  #     theme(legend.position = "none") + 
+  #     xlim(0,60) + 
+  #     coord_flip() + 
+  #     theme(axis.title.y = element_blank(),
+  #           axis.text.y = element_blank())
+  # }
+  # 
+  # if (exists("ydensity") & exists("xdensity")) {
+  #   
+  #   blankPlot <- ggplot() + geom_blank(aes(1,1)) +
+  #     theme(
+  #       plot.background = element_blank(), 
+  #       panel.grid.major = element_blank(),
+  #       panel.grid.minor = element_blank(), 
+  #       panel.border = element_blank(),
+  #       panel.background = element_blank(),
+  #       axis.title.x = element_blank(),
+  #       axis.title.y = element_blank(),
+  #       axis.text.x = element_blank(), 
+  #       axis.text.y = element_blank(),
+  #       axis.ticks = element_blank(),
+  #       axis.line = element_blank()
+  #     )
+  #   
+  #   p <- grid.arrange(xdensity, blankPlot, p, ydensity, 
+  #                ncol=2, nrow=2, widths=c(4, 1.4), heights=c(1.4, 4))
+  # } else {
+  #   if (exists("xdensity"))
+  #   p <- grid.arrange(xdensity, p, 
+  #                     ncol=1, nrow=2, widths=c(10), heights=c(2.5,7.5))
+  #   
+  #   if (exists("ydensity"))
+  #   p <- grid.arrange(p, ydensity, 
+  #                      ncol=2, nrow=1, widths=c(7.5, 2.5), heights=c(10)) 
+  # }
   
   
   # if (all(is.na(observed$SWC))) {
